@@ -28,6 +28,14 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		}
 	}
 	
+	public int id() {
+		return id.intValue();
+	}
+
+	/**
+	 * Save all changes
+	 * @return true on success
+	 */
 	public boolean commit() {
 		try {
 			String query;
@@ -63,6 +71,12 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		}
 	}
 	
+	/**
+	 * Return first object having attr == value
+	 * @param attr
+	 * @param value
+	 * @return
+	 */
 	public T first(String attr, Object value) {
 		try {
 			PreparedStatement stmt = statement("`"+ attr + "` = ? limit 1");
@@ -82,26 +96,39 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		}
 	}
 	
+	
+	/**
+	 * Return object having id == id
+	 * @param id
+	 * @return
+	 */
 	public T from_id(int id) {
 		return first(id_name(), new Integer(id));
 	}
 	
+	/**
+	 * Return all objects of this model
+	 * @return
+	 */
+	public ArrayList<T> all() {
+		PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name());
+		return where(stmt);
+	}
+	
+	/**
+	 * Search for all objects having attr == value
+	 * @param attr
+	 * @param value
+	 * @return
+	 */
 	public ArrayList<T> find(String attr, Object value) {
 		try {
-			PreparedStatement stmt = statement("`"+ attr + "` = ?");
-			stmt.setObject(1, value);
+			PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name());
 			return where(stmt);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-	}
-	
-	protected void set_from_db(ResultSetMetaData meta, ResultSet rs) throws SQLException {
-		for(int i=1; i<=meta.getColumnCount(); ++i) {
-			values.put(meta.getColumnName(i), rs.getObject(i));
-		}
-		id = (Integer)get(id_name());
 	}
 	
 	public void set(String field, Object value) {
@@ -110,10 +137,6 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	
 	public Object get(String field) {
 		return values.get(field);
-	}
-	
-	protected int get_int(String field) {
-		return ((Integer)get(field)).intValue();
 	}
 	
 	public ArrayList<T> where(PreparedStatement stmt) {
@@ -137,6 +160,18 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		return DatabaseConnection.get().prepareStatement("select * from "+table_name()+" WHERE "+where);
 	}
 	
+	protected void set_from_db(ResultSetMetaData meta, ResultSet rs) throws SQLException {
+		for(int i=1; i<=meta.getColumnCount(); ++i) {
+			values.put(meta.getColumnName(i), rs.getObject(i));
+		}
+		id = (Integer)get(id_name());
+	}
+	
+	protected int get_int(String field) {
+		return ((Integer)get(field)).intValue();
+	}
+	
+	
 	protected static class Field {
 		public final String name;
 		public final int type;
@@ -149,10 +184,6 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		public String toString() {
 			return name + " ("+type +")";
 		}
-	}
-	
-	public int id() {
-		return id.intValue();
 	}
 	
 	public String toString() {

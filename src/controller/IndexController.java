@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,8 +14,9 @@ public class IndexController extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		Trade t = Trade.q().from_id(1);
-		System.out.println(t);
-		System.out.println(t.getTime());
+		ArrayList<Trade> trades = Trade.q().all();
+		for(Trade t : trades) {
+			System.out.println(t);
+		}
 	}
 }
