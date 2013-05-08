@@ -26,7 +26,7 @@
 		<div class="buySell">
 			<h3>Buy & Sell Security</h3>
 			<form action="/IndexController">
-			<input type="hidden" name="action" value="addOrder">
+			<input type="hidden" name="action" value="buySell">
 			Security: <select name="security">
 			<option value="Ericsson">Ericsson</option>
 			</select><br>
@@ -38,10 +38,10 @@
 
 		</div>
 
-		<div class="listPappers">
+		<div class="listSecurity">
 			<h3>List Security History</h3>
 			<form action="/IndexController">
-			<input type="hidden" name="action" value="viewTrades">
+			<input type="hidden" name="action" value="listSecurity">
 			Security: <select name="security">
 			<option value="Ericsson">Ericsson</option>
 			</select><br>
