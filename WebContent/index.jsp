@@ -18,7 +18,7 @@
 			<h3>Add New Security</h3>
 			<form action="/IndexController">
 			<input type="hidden" name="action" value="addSecurity">
-			<input type="text" name="security" value=""><br>
+			<input type="text" name="securityName" value=""><br>
 			<input type="submit" value="Commit Security">
 			</form>
 		</div>

@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Security;
+
 public class IndexController extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -19,11 +21,15 @@ public class IndexController extends HttpServlet {
 		 * }
 		 */
 
-		String msg = null; // Error handeling
+		String msg = null; // Error handling
 
 		if (req.getParameter("action").equals("addSecurity")) {
 			msg = "addSecurity";
-			// TODO Handle adding new Securities
+			// TODO Duplicate entries?
+			Security secObj = new Security(); // Create new Security object
+			// Smart, new update -> ID
+			secObj.setName(req.getParameter("securityName")); // Fetch from field
+			secObj.commit(); // Write object to database
 		}
 
 		if (req.getParameter("action").equals("buySell")) {
