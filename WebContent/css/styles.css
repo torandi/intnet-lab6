@@ -1,0 +1,15 @@
+body {
+	text-align: center;
+	font-family: "Times New Roman,Georgia,Serif";
+	background-color: #fff
+}
+
+h1 {
+	font-weight: bold;
+	height: 50 px;
+}
+
+div.pagecontainer{
+	background-color: #fff;
+	margin: auto;
+}
