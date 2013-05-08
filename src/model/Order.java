@@ -1,7 +1,8 @@
 package model;
 
+// Model for Order Table
 public class Order extends DatabaseObject<Order> {
-	
+
 	private static final Order query_obj = new Order();
 
 	/* the query object */
@@ -13,49 +14,49 @@ public class Order extends DatabaseObject<Order> {
 	protected String table_name() {
 		return "orders";
 	}
-	
+
 	public Security getSecurity() {
 		return Security.q().from_id(getSecurityId());
 	}
-	
+
 	public int getSecurityId() {
 		return get_int("security_id");
 	}
-	
+
 	public void setSecurityId(int id) {
-		set("security_id",new Integer(id));
+		set("security_id", new Integer(id));
 	}
-	
+
 	public String getType() {
-		return (String)get("type");
+		return (String) get("type");
 	}
-	
+
 	public void setType(String type) {
-		set("type",type);
+		set("type", type);
 	}
-	
+
 	public float getPrice() {
-		return ((Float)get("price")).floatValue();
+		return ((Float) get("price")).floatValue();
 	}
-	
+
 	public void setPrice(float price) {
-		set("price",new Float(price));
+		set("price", new Float(price));
 	}
-	
+
 	public int getAmount() {
 		return get_int("amount");
 	}
-	
+
 	public void setAmount(int amount) {
-		set("amount",new Integer(amount));
+		set("amount", new Integer(amount));
 	}
-	
+
 	public String getUid() {
-		return (String)get("uid");
+		return (String) get("uid");
 	}
-	
+
 	public void setUid(String uid) {
-		set("uid",uid);
+		set("uid", uid);
 	}
 
 	@Override

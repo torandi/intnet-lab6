@@ -1,7 +1,8 @@
 package model;
 
+//Modell for Security Table
 public class Security extends DatabaseObject<Security> {
-	
+
 	private static final Security query_obj = new Security();
 
 	/* the query object */
@@ -13,11 +14,11 @@ public class Security extends DatabaseObject<Security> {
 	protected String table_name() {
 		return "securities";
 	}
-	
+
 	public String getName() {
-		return (String)get("name");
+		return (String) get("name");
 	}
-	
+
 	public void setName(String name) {
 		set("name", name);
 	}
