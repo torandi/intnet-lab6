@@ -14,15 +14,39 @@
 	
 	<div class="pagecontainer">
 		
-		<div class="table">
-			<table id="tradingTable"></table>
-			<h3>Table goes here</h3>
+		<div class="addSecurity">
+			<h3>Add New Security</h3>
+			<form action="/IndexController">
+			<input type="hidden" name="action" value="addSecurity">
+			<input type="text" name="security" value=""><br>
+			<input type="submit" value="Commit Security">
+			</form>
 		</div>
 
-		<div class="menu">
-			<button type="button">Add</button> 
-			<button type="button">Buy/Sell</button> 
-			<button type="button">List</button> 
+		<div class="buySell">
+			<h3>Buy & Sell Security</h3>
+			<form action="/IndexController">
+			<input type="hidden" name="action" value="addOrder">
+			Security: <select name="security">
+			<option value="Ericsson">Ericsson</option>
+			</select><br>
+			Buy: <input type="radio" name="buyOrSell" value="1" checked>
+			Sell: <input type="radio" name="buyOrSell" value="0"><br>
+			Price: <input type="text" name="price" value=""><br>
+			Amount: <input type="text" name="amount" value=""><br>
+			<input type="submit" value="Commit Order">
+
+		</div>
+
+		<div class="listPappers">
+			<h3>List Security History</h3>
+			<form action="/IndexController">
+			<input type="hidden" name="action" value="viewTrades">
+			Security: <select name="security">
+			<option value="Ericsson">Ericsson</option>
+			</select><br>
+			<input type="submit" value="Show History">
+			</form>
 		</div>
 
 	</div>
