@@ -1,22 +1,25 @@
 <!doctype html>
+<%@page import="java.util.ArrayList"%>
+<%@page import="model.Security"%>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Torandium Trading Corp</title>
   <link rel="stylesheet" href="css/styles.css?v=1.0">
-  <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
 </head>
+<body>
 	<header>		
 	<h1>Torandium Trading Corp</h1>
 	</header>
 	
+	<jsp:useBean id="date" class="java.util.Date" /> 
+	<p>The date/time is <%= date %></p>
+
 	<div class="pagecontainer">
 		
 		<div class="addSecurity">
 			<h3>Add New Security</h3>
-			<form action="/IndexController">
+			<form method="Post">
 			<input type="hidden" name="action" value="addSecurity">
 			<input type="text" name="securityName" value=""><br>
 			<input type="submit" value="Commit Security">
@@ -25,22 +28,31 @@
 
 		<div class="buySell">
 			<h3>Buy & Sell Security</h3>
-			<form action="/IndexController">
+			<form method="Post">
 			<input type="hidden" name="action" value="buySell">
+			
 			Security: <select name="security">
-			<option value="Ericsson">Ericsson</option>
+			<%
+			ArrayList<Security> securities = (ArrayList<Security>)request.getServletContext().getAttribute("securities");
+			for(Security s : securities){
+				%> <option value="<%=s.id()%>"><%=s.getName() %></option>
+				<%
+			}
+			%>
 			</select><br>
-			Buy: <input type="radio" name="buyOrSell" value="1" checked>
-			Sell: <input type="radio" name="buyOrSell" value="0"><br>
+			
+			Buy: <input type="radio" name="buyOrSell" value="True" checked>
+			Sell: <input type="radio" name="buyOrSell" value="False"><br>
+			Seller/Buyer: <input type="text" name="uid" value=""><br>
 			Price: <input type="text" name="price" value=""><br>
 			Amount: <input type="text" name="amount" value=""><br>
 			<input type="submit" value="Commit Order">
-
+			</form>
 		</div>
 
 		<div class="listSecurity">
 			<h3>List Security History</h3>
-			<form action="/IndexController">
+			<form method="Post">
 			<input type="hidden" name="action" value="listSecurity">
 			Security: <select name="security">
 			<option value="Ericsson">Ericsson</option>
@@ -52,7 +64,7 @@
 	</div>
 
 	<footer>
-		<h4>Footer goes here</h1>
+		<h4>Footer goes here</h4>
 	</footer>
 <body>
   <script src="js/scripts.js"></script>

@@ -31,7 +31,7 @@ public class Order extends DatabaseObject<Order> {
 		return (String) get("type");
 	}
 
-	public void setType(String type) {
+	public void setType(Boolean type) {
 		set("type", type);
 	}
 
@@ -51,6 +51,7 @@ public class Order extends DatabaseObject<Order> {
 		set("amount", new Integer(amount));
 	}
 
+	// Buyer Seller
 	public String getUid() {
 		return (String) get("uid");
 	}
