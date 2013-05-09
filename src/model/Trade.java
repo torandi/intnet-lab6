@@ -2,6 +2,8 @@ package model;
 
 import java.sql.Timestamp;
 
+import org.apache.tomcat.jni.Time;
+
 // Model for Trades tabel
 public class Trade extends DatabaseObject<Trade> {
 
@@ -72,5 +74,20 @@ public class Trade extends DatabaseObject<Trade> {
 	@Override
 	protected Class<Trade> cls() {
 		return Trade.class;
+	}
+
+	/* 
+	 * Populates a trade object with data from orders, does not commit
+	 */
+	public static Trade from_orders(Order buy_order, Order sell_order) {
+		Trade trade = new Trade();
+		
+		trade.setAmount(buy_order.getAmount());
+		trade.setBuyer(buy_order.getUid());
+		trade.setSeller(sell_order.getUid());
+		trade.setPrice(sell_order.getPrice());
+		trade.setTime(new Timestamp(Time.now()));
+		trade.setSecurityId(buy_order.getSecurityId());
+		return trade;
 	}
 }

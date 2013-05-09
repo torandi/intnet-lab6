@@ -1,6 +1,6 @@
 package model;
 
-//Modell for Security Table
+//Model for Security Table
 public class Security extends DatabaseObject<Security> {
 
 	private static final Security query_obj = new Security();
@@ -8,6 +8,12 @@ public class Security extends DatabaseObject<Security> {
 	/* the query object */
 	public static Security q() {
 		return query_obj;
+	}
+	
+	@Override
+	public void validate() throws ValidationException {
+		validateMinLength("name", 3);
+		validateUniqueness("name");
 	}
 
 	@Override

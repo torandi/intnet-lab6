@@ -11,6 +11,11 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	
 	protected abstract Class<T> cls();
 	protected abstract String table_name();
+
+	/* Hooks that are optional to implement */
+	protected void post_commit_hook() { };
+	public void validate() throws ValidationException { }
+	
 	protected String id_name() { return "id"; };
 
 	public DatabaseObject(){
@@ -35,40 +40,47 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	/**
 	 * Save all changes
 	 * @return true on success
+	 * @throws ValidationException, SQLException
 	 */
-	public boolean commit() {
-		try {
-			String query;
-			if(id == null) {
-				query = "insert into `"+table_name()+"` SET ";
-			} else {
-				query = "update `"+table_name()+"` SET ";
+	public boolean commit() throws SQLException, ValidationException {
+		validate();
+		String query;
+		if(id == null) {
+			query = "insert into `"+table_name()+"` SET ";
+		} else {
+			query = "update `"+table_name()+"` SET ";
+		}
+		for(Field f : columns) {
+			if(!f.name.equals(id_name())) {
+				query +="`"+f.name+"` = ?,";
 			}
-			for(Field f : columns) {
-				if(!f.name.equals(id_name())) {
-					query +="`"+f.name+"` = ?,";
-				}
+		}
+		query = query.substring(0, query.length() - 1);
+		if(id != null) {
+			query += "where `"+id_name()+"` = ?";
+		}
+		PreparedStatement stmt = DatabaseConnection.get().prepareStatement(query);
+		int index = 1;
+		for(Field f : columns) {
+			if(!f.name.equals(id_name())) {
+				stmt.setObject(index++, get(f.name), f.type);
 			}
-			query = query.substring(0, query.length() - 1);
-			if(id != null) {
-				query += "where `"+id_name()+"` = ?";
-			}
-			PreparedStatement stmt = DatabaseConnection.get().prepareStatement(query);
-			int index = 1;
-			for(Field f : columns) {
-				if(!f.name.equals(id_name())) {
-					stmt.setObject(index++, get(f.name), f.type);
-				}
-			}
-			if(id != null) {
-				stmt.setInt(index, id);
-			}
-			return stmt.execute();
-		} catch (SQLException e) {
-			System.err.println("Commit failed");
-			e.printStackTrace();
+		}
+		if(id != null) {
+			stmt.setInt(index, id);
+		}
+		return stmt.execute();
+	}
+	
+	
+	public boolean delete() throws SQLException {
+		if(id == null) {
+			System.err.println("Can't delete unsaved DatabaseObject");
 			return false;
 		}
+		PreparedStatement stmt = DatabaseConnection.get().prepareStatement("delete from `"+table_name()+"` where `"+id_name()+"`=?");
+		stmt.setInt(1, id);
+		return stmt.execute();
 	}
 	
 	/**
@@ -193,5 +205,20 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		}
 		str += "}";
 		return str;
+	}
+	
+	protected void validateExistance(String attr) throws ValidationException {
+		if(get(attr) == null) throw new ValidationException(attr, "Must be set.");
+	}
+	
+	protected void validateMinLength(String attr, int min_length) throws ValidationException {
+		validateExistance(attr);
+		if(((String)get(attr)).length() < min_length) throw new ValidationException(attr, "Must be at least " +min_length + " characters long.");
+	}
+	
+	protected void validateUniqueness(String attr) throws ValidationException {
+		if(first(attr, get(attr)) != null) {
+			throw new ValidationException(attr, "Must be unique");
+		}
 	}
 }

@@ -8,3 +8,19 @@ div.pagecontainer{
 	background-color: #fff;
 	margin: auto;
 }
+
+
+.success, .error {
+	border: 1px solid black;
+	margin: 5px 10px;
+	padding: 10px;
+	font-weight: bold;
+}
+
+.error {
+	background: #f77;
+}
+
+.success {
+	background: #7f7;
+}

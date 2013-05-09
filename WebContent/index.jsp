@@ -16,10 +16,21 @@
 	<h1>Torandium Trading Corp</h1>
 	</header>
 	
-	<jsp:useBean id="date" class="java.util.Date" /> 
-	<p>The date/time is <%= date %></p>
-
 	<div class="pagecontainer">
+	<%
+		String error = (String) request.getServletContext().getAttribute("error");
+		String success = (String) request.getServletContext().getAttribute("success");
+		if(error != null) {
+	%>
+			<p class='error'><%=error %> </p>
+	<%
+		}
+		if(success != null) {
+	%>
+			<p class='success'><%=success %></p>
+	<%
+		}
+	%>
 		
 		<div class="addSecurity">
 			<h3>Add New Security</h3>
