@@ -13,6 +13,32 @@ public class Order extends DatabaseObject<Order> {
 	public static Order q() {
 		return query_obj;
 	}
+	
+	protected String default_order() {
+		return "id DESC";
+	}
+	
+	@Override
+	public void validate() throws ValidationException {
+		try {
+		validateMinLength("uid", 3);
+		} catch (ValidationException e) {
+			throw new ValidationException((isBuyOrder() ? "Buyer" : "Seller") + "name", e.getError());
+		}
+		validateExistance("type");
+		validateExistance("security_id");
+		validateExistance("price");
+		validateExistance("amount");
+		if(getPrice() <= 0) {
+			throw new ValidationException("price", "Must be greater than 0");
+		}
+		if(getAmount() < 1) {
+			throw new ValidationException("amount", "Must be at least 1");
+		}
+		if(getSecurity() == null) {
+			throw new ValidationException("security", "Does not exist");
+		}
+	}
 
 	@Override
 	protected String table_name() {

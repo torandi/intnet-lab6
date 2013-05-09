@@ -2,7 +2,7 @@ package model;
 
 import java.sql.Timestamp;
 
-import org.apache.tomcat.jni.Time;
+import java.util.Date;
 
 // Model for Trades tabel
 public class Trade extends DatabaseObject<Trade> {
@@ -12,6 +12,10 @@ public class Trade extends DatabaseObject<Trade> {
 	/* the query object */
 	public static Trade q() {
 		return query_obj;
+	}
+	
+	protected String default_order() {
+		return "dt ASC";
 	}
 
 	@Override
@@ -86,7 +90,7 @@ public class Trade extends DatabaseObject<Trade> {
 		trade.setBuyer(buy_order.getUid());
 		trade.setSeller(sell_order.getUid());
 		trade.setPrice(sell_order.getPrice());
-		trade.setTime(new Timestamp(Time.now()));
+		trade.setTime(new Timestamp(new Date().getTime()));
 		trade.setSecurityId(buy_order.getSecurityId());
 		return trade;
 	}

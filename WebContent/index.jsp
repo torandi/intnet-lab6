@@ -1,4 +1,5 @@
 <!doctype html>
+<%@page import="model.Trade"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="model.Security"%>
 <%
@@ -58,16 +59,16 @@
 			Buy: <input type="radio" name="buyOrSell" value="True" checked>
 			Sell: <input type="radio" name="buyOrSell" value="False"><br>
 			Seller/Buyer: <input type="text" name="uid" value=""><br>
-			Price: <input type="text" name="price" value=""><br>
+			Price (SEK): <input type="text" name="price" value=""><br>
 			Amount: <input type="text" name="amount" value=""><br>
 			<input type="submit" value="Commit Order">
 			</form>
 		</div>
 
-		<div class="listSecurity">
-			<h3>List Security History</h3>
+		<div class="listTrades">
+			<h3>List trade history</h3>
 			<form method="Post">
-			<input type="hidden" name="action" value="listSecurity">
+			<input type="hidden" name="action" value="listHistory">
 			<label for="history_security">Security: </label><select name="security" id="history_security">
 			<%
 			for(Security s : securities){
@@ -78,6 +79,35 @@
 			</select><br>
 			<input type="submit" value="Show History">
 			</form>
+			<%
+				String trade_history = (String) request.getServletContext().getAttribute("history_security");	
+				if(trade_history != null) {
+					%>
+					<h2>History for <%=trade_history %></h2>
+					<table>
+					<thead>
+						<tr><th>Seller</th><th>Buyer</th><th>Price</th><th>Amount</th><th>Transaction date</th></tr>
+					</thead>
+					<tbody>
+					<%
+						@SuppressWarnings("unchecked")
+						ArrayList<Trade> trades = (ArrayList<Trade>)request.getServletContext().getAttribute("history");
+						for(Trade trade : trades) {
+							%><tr>
+								<td><%=trade.getSeller() %></td>
+								<td><%=trade.getBuyer() %></td>
+								<td><%=trade.getPrice() %> SEK</td>
+								<td><%=trade.getAmount() %></td>
+								<td><%=trade.getTime() %></td>
+							</tr>
+							<%
+						}
+					%>
+					</tbody>
+					</table>
+					<%
+				}
+			%>
 		</div>
 
 	</div>

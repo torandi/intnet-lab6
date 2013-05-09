@@ -1,5 +1,8 @@
 package model;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 //Model for Security Table
 public class Security extends DatabaseObject<Security> {
 
@@ -27,6 +30,16 @@ public class Security extends DatabaseObject<Security> {
 
 	public void setName(String name) {
 		set("name", name);
+	}
+	
+	public ArrayList<Trade> getTrades() {
+		if(id == null) return new ArrayList<Trade>();
+		try {
+		return Trade.q().find("security_id", id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new ArrayList<Trade>();
+		}
 	}
 
 	@Override

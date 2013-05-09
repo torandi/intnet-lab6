@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -16,13 +17,15 @@ import model.ValidationException;
 
 public class IndexController extends HttpServlet {
 	
-	private String error = null;
-	private String success = null;
+	private String error;
+	private String success;
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		String action = req.getParameter("action");
+		error = null;
+		success = null;
 
 		
 		try {
@@ -56,16 +59,11 @@ public class IndexController extends HttpServlet {
 					}
 				}
 	
-				if (action.equals("listSecurity")) {
-	
-					Trade trdObj = new Trade();
-					/*
-					 * if (Boolean.parseBoolean(req.getParameter("buyOrSell")) == true) { // Buy
-					 * ordObj.setUid(req.getParameter("uid"));
-					 * } else { // Sell
-					 * ordObj.setUid(req.getParameter("uid"));
-					 * }
-					 */
+				if (action.equals("listHistory")) {
+					Integer s_id = Integer.parseInt(req.getParameter("security"));
+					Security s = Security.q().from_id(s_id);
+					req.getServletContext().setAttribute("history", s.getTrades());
+					req.getServletContext().setAttribute("history_security", s.getName());
 				}
 			}
 		} catch (ValidationException e){
@@ -81,12 +79,9 @@ public class IndexController extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		/*
-		 * ArrayList<Trade> trades = Trade.q().all();
-		 * for (Trade t : trades) {
-		 * System.out.println(t);
-		 * }
-		 */
+		error = null;
+		success = null;
+		
 		render(req, resp);
 
 	}
@@ -94,7 +89,12 @@ public class IndexController extends HttpServlet {
 	public void render(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-		ArrayList<Security> dropDown = Security.q().all(); // Popullera Dropdown
+		ArrayList<Security> dropDown = new ArrayList<Security>();
+		try {
+			dropDown = Security.q().all();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		req.getServletContext().setAttribute("securities", dropDown);
 		
 		req.getServletContext().setAttribute("success", success);

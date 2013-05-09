@@ -14,6 +14,7 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 
 	/* Hooks that are optional to implement */
 	protected void post_commit_hook() { };
+	protected String default_order() { return "`" + id_name() + "`"; };
 	public void validate() throws ValidationException { }
 	
 	protected String id_name() { return "id"; };
@@ -88,22 +89,23 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	 * @param attr
 	 * @param value
 	 * @return
+	 * @throws SQLException 
 	 */
-	public T first(String attr, Object value) {
-		try {
-			PreparedStatement stmt = statement("`"+ attr + "` = ? limit 1");
-			stmt.setObject(1, value);
-			ResultSet rs = stmt.executeQuery();
-			ResultSetMetaData meta = rs.getMetaData();
-			if(rs.first()) {
-				T obj = cls().newInstance();
+	public T first(String attr, Object value) throws SQLException {
+		PreparedStatement stmt = statement("`"+ attr + "` = ? " + order_string() + " limit 1");
+		stmt.setObject(1, value);
+		ResultSet rs = stmt.executeQuery();
+		ResultSetMetaData meta = rs.getMetaData();
+		if(rs.first()) {
+			T obj = null;
+			try {
+				obj = cls().newInstance();
 				obj.set_from_db(meta, rs);
-				return obj;
-			} else {
-				return null;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			return obj;
+		} else {
 			return null;
 		}
 	}
@@ -115,15 +117,21 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	 * @return
 	 */
 	public T from_id(int id) {
-		return first(id_name(), new Integer(id));
+		try {
+			return first(id_name(), new Integer(id));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
 	 * Return all objects of this model
 	 * @return
+	 * @throws SQLException 
 	 */
-	public ArrayList<T> all() {
-		PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name());
+	public ArrayList<T> all() throws SQLException {
+		PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name() + order_string());
 		return where(stmt);
 	}
 	
@@ -132,15 +140,11 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	 * @param attr
 	 * @param value
 	 * @return
+	 * @throws SQLException 
 	 */
-	public ArrayList<T> find(String attr, Object value) {
-		try {
-			PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name());
-			return where(stmt);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public ArrayList<T> find(String attr, Object value) throws SQLException {
+		PreparedStatement stmt = DatabaseConnection.get().prepareStatement("select * from "+table_name() + order_string());
+		return where(stmt);
 	}
 	
 	public void set(String field, Object value) {
@@ -151,21 +155,21 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 		return values.get(field);
 	}
 	
-	public ArrayList<T> where(PreparedStatement stmt) {
-		try {
-			ResultSet rs = stmt.executeQuery();
-			ResultSetMetaData meta = rs.getMetaData();
-			ArrayList<T> res = new ArrayList<T>();
-			while(rs.next()) {
+	public ArrayList<T> where(PreparedStatement stmt) throws SQLException {
+		ResultSet rs = stmt.executeQuery();
+		ResultSetMetaData meta = rs.getMetaData();
+		ArrayList<T> res = new ArrayList<T>();
+		while(rs.next()) {
+			try {
 				T obj = cls().newInstance();
 				obj.set_from_db(meta, rs);
 				res.add(obj);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ArrayList<T>();
 			}
-			return res;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
 		}
+		return res;
 	}
 	
 	public PreparedStatement statement(String where) {
@@ -217,8 +221,17 @@ public abstract class DatabaseObject<T extends DatabaseObject<T>> {
 	}
 	
 	protected void validateUniqueness(String attr) throws ValidationException {
-		if(first(attr, get(attr)) != null) {
-			throw new ValidationException(attr, "Must be unique");
+		try {
+			if(first(attr, get(attr)) != null) {
+				throw new ValidationException(attr, "Must be unique");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new ValidationException(attr, "An SQL error occurred while trying to validate uniqueness");
 		}
+	}
+	
+	private String order_string() {
+		return " ORDER BY " + default_order();
 	}
 }
