@@ -1,6 +1,10 @@
 <!doctype html>
 <%@page import="java.util.ArrayList"%>
 <%@page import="model.Security"%>
+<%
+	@SuppressWarnings("unchecked")
+	ArrayList<Security> securities = (ArrayList<Security>)request.getServletContext().getAttribute("securities");
+%>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -22,7 +26,7 @@
 			<form method="Post">
 			<input type="hidden" name="action" value="addSecurity">
 			<input type="text" name="securityName" value=""><br>
-			<input type="submit" value="Commit Security">
+			<input type="submit" value="Create security">
 			</form>
 		</div>
 
@@ -31,9 +35,8 @@
 			<form method="Post">
 			<input type="hidden" name="action" value="buySell">
 			
-			Security: <select name="security">
+			<label for="buysell_security">Security: </label><select name="security" id="buysell_security">
 			<%
-			ArrayList<Security> securities = (ArrayList<Security>)request.getServletContext().getAttribute("securities");
 			for(Security s : securities){
 				%> <option value="<%=s.id()%>"><%=s.getName() %></option>
 				<%
@@ -54,8 +57,13 @@
 			<h3>List Security History</h3>
 			<form method="Post">
 			<input type="hidden" name="action" value="listSecurity">
-			Security: <select name="security">
-			<option value="Ericsson">Ericsson</option>
+			<label for="history_security">Security: </label><select name="security" id="history_security">
+			<%
+			for(Security s : securities){
+				%> <option value="<%=s.id()%>"><%=s.getName() %></option>
+				<%
+			}
+			%>
 			</select><br>
 			<input type="submit" value="Show History">
 			</form>
