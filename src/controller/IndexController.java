@@ -12,14 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.Order;
 import model.Security;
-import model.Trade;
 import model.ValidationException;
 
 public class IndexController extends HttpServlet {
-	
+
 	private String error;
 	private String success;
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -27,7 +26,6 @@ public class IndexController extends HttpServlet {
 		error = null;
 		success = null;
 
-		
 		try {
 			if (action != null) {
 				if (action.equals("addSecurity")) {
@@ -36,13 +34,14 @@ public class IndexController extends HttpServlet {
 					// Smart, new update -> ID
 					secObj.setName(req.getParameter("securityName")); // Fetch from field
 					secObj.commit(); // Write object to database
-					success = "The security "+secObj.getName()+" was created.";
+					success = "The security " + secObj.getName()
+							+ " was created.";
 				}
-	
+
 				if (action.equals("buySell")) {
-	
+
 					Order ordObj = new Order();
-	
+
 					ordObj.setSecurityId(Integer.parseInt(req
 							.getParameter("security"))); // Id från dropDown värdet
 					// Hämta från Sec
@@ -50,43 +49,46 @@ public class IndexController extends HttpServlet {
 							.getParameter("buyOrSell")));
 					ordObj.setUid(req.getParameter("uid"));
 					ordObj.setPrice(Float.parseFloat(req.getParameter("price")));
-					ordObj.setAmount(Integer.parseInt(req.getParameter("amount")));
+					ordObj.setAmount(Integer.parseInt(req
+							.getParameter("amount")));
 					ordObj.commit();
-					if(ordObj.match()) {
+					if (ordObj.match()) {
 						success = "Your order was placed, and a matching sell order was found.";
 					} else {
 						success = "Your order was placed.";
 					}
 				}
-	
+
 				if (action.equals("listHistory")) {
-					Integer s_id = Integer.parseInt(req.getParameter("security"));
+					Integer s_id = Integer.parseInt(req
+							.getParameter("security"));
 					Security s = Security.q().from_id(s_id);
-					req.getServletContext().setAttribute("history", s.getTrades());
-					req.getServletContext().setAttribute("history_security", s.getName());
+					req.getServletContext().setAttribute("history",
+							s.getTrades());
+					req.getServletContext().setAttribute("history_security",
+							s.getName());
 				}
 			}
-		} catch (ValidationException e){
+		} catch (ValidationException e) {
 			success = null;
 			error = e.getMessage();
-		} catch (Exception e){
+		} catch (Exception e) {
 			success = null;
-			error = "An error occurred: "+e.getMessage();
+			error = "An error occurred: " + e.getMessage();
 		}
 		render(req, resp);
 	};
 
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		error = null;
 		success = null;
-		
-		render(req, resp);
 
+		render(req, resp);
 	}
 
-	public void render(HttpServletRequest req, HttpServletResponse resp)
+	private void render(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
 		ArrayList<Security> dropDown = new ArrayList<Security>();
@@ -96,7 +98,7 @@ public class IndexController extends HttpServlet {
 			e.printStackTrace();
 		}
 		req.getServletContext().setAttribute("securities", dropDown);
-		
+
 		req.getServletContext().setAttribute("success", success);
 		req.getServletContext().setAttribute("error", error);
 

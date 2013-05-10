@@ -12,7 +12,7 @@ public class Security extends DatabaseObject<Security> {
 	public static Security q() {
 		return query_obj;
 	}
-	
+
 	@Override
 	public void validate() throws ValidationException {
 		validateMinLength("name", 3);
@@ -31,11 +31,12 @@ public class Security extends DatabaseObject<Security> {
 	public void setName(String name) {
 		set("name", name);
 	}
-	
+
 	public ArrayList<Trade> getTrades() {
-		if(id == null) return new ArrayList<Trade>();
+		if (id == null)
+			return new ArrayList<Trade>();
 		try {
-		return Trade.q().find("security_id", id);
+			return Trade.q().find("security_id", id);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return new ArrayList<Trade>();

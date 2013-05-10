@@ -1,7 +1,6 @@
 package model;
 
 import java.sql.Timestamp;
-
 import java.util.Date;
 
 // Model for Trades tabel
@@ -13,7 +12,7 @@ public class Trade extends DatabaseObject<Trade> {
 	public static Trade q() {
 		return query_obj;
 	}
-	
+
 	protected String default_order() {
 		return "dt ASC";
 	}
@@ -80,12 +79,12 @@ public class Trade extends DatabaseObject<Trade> {
 		return Trade.class;
 	}
 
-	/* 
+	/*
 	 * Populates a trade object with data from orders, does not commit
 	 */
 	public static Trade from_orders(Order buy_order, Order sell_order) {
 		Trade trade = new Trade();
-		
+
 		trade.setAmount(buy_order.getAmount());
 		trade.setBuyer(buy_order.getUid());
 		trade.setSeller(sell_order.getUid());
